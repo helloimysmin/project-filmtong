@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.filmtong.movie.mapper.PopularMovieMapper">
+	<sql id="popularMovieCols">
+		ID, TITLE, ADULT, ORIGINAL_TITLE,
+		OVERVIEW, POPULARITY, RELEASE_DATE, VOTE_AVERAGE,
+		VOTE_COUNT, POSTER_PATH, BACKDROP_PATH
+	</sql>
+	<sql id="allMovieInfoCols">
+		PM.ID, PM.TITLE, PM.ADULT, PM.ORIGINAL_TITLE,
+		PM.OVERVIEW, PM.POPULARITY, PM.RELEASE_DATE, PM.VOTE_AVERAGE,
+		PM.VOTE_COUNT, PM.POSTER_PATH, PM.BACKDROP_PATH,
+		GROUP_CONCAT(GI.GENRE_ID) AS GENRE_ID, GROUP_CONCAT(MG.NAME) AS NAME
+		FROM POPULAR_MOVIE AS PM
+		INNER JOIN GENRE_INFO AS GI ON
+		PM.ID=GI.ID 
+		INNER JOIN MOVIE_GENRE AS MG
+		ON GI.GENRE_ID=MG.GENRE_ID
+	</sql>
+	<select id="selectPopularMovieList" resultType="info.filmtong.movie.vo.popular.PopularMovieInfoVO">
+		SELECT
+		<include refid="allMovieInfoCols" />
+		<where>
+			<if test='title != null and title !=""'>
+				AND REPLACE(TITLE, ' ', '') LIKE CONCAT('%', #{title} , '%')
+			</if>
+			<if test='name != null and name !=""'>
+				AND REPLACE(NAME, ' ', '') LIKE CONCAT('%', #{name} , '%')
+			</if>
+			AND NOT POPULARITY = 0
+		</where>
+		GROUP BY PM.ID
+		ORDER BY POPULARITY DESC
+	</select>
+	<select id="selectPopularMovieListById" resultType="info.filmtong.movie.vo.popular.PopularMovieInfoVO">
+		SELECT
+		<include refid="allMovieInfoCols" />	
+		WHERE PM.ID=#{id}
+		ORDER BY POPULARITY DESC
+	</select>
+	<select id="selectRecommendMovies" resultType="info.filmtong.movie.vo.popular.PopularMovieInfoVO">
+		SELECT 
+		<include refid="allMovieInfoCols" />
+		<where>
+			NOT OVERVIEW IN ('')
+			AND VOTE_AVERAGE &gt;=7.8
+			<if test='title != null and title !=""'>
+				AND TITLE LIKE CONCAT('%', #{title} , '%')
+			</if>
+		</where>
+		GROUP BY PM.ID
+		ORDER BY VOTE_AVERAGE DESC
+	</select>
+	<select id="selectRecommendMoviesRandom" resultType="info.filmtong.movie.vo.popular.PopularMovieInfoVO">
+		SELECT 
+		<include refid="allMovieInfoCols" />
+		<where>
+			NOT OVERVIEW IN ('')
+			AND VOTE_AVERAGE &gt;=7.9
+			<if test='title != null and title !=""'>
+				AND TITLE LIKE CONCAT('%', #{title} , '%')
+			</if>
+		</where>
+		GROUP BY PM.ID
+		ORDER BY RAND()
+	</select>
+	<select id="selectPopularMoviesRandom" resultType="info.filmtong.movie.vo.popular.PopularMovieInfoVO">
+		SELECT 
+		<include refid="allMovieInfoCols" />
+		<where>
+		POPULARITY &gt;=1000
+		</where>
+		GROUP BY PM.ID
+		ORDER BY RAND()
+	</select>
+	<select id="selectHofMovies" resultType="info.filmtong.movie.vo.popular.PopularMovieInfoVO">
+		SELECT 
+		<include refid="allMovieInfoCols" />
+		<where>
+		VOTE_COUNT &gt;= 10000
+		</where>
+		GROUP BY PM.ID 
+		ORDER BY VOTE_COUNT DESC
+	</select>
+	<insert id="insertPopularMovies" parameterType="info.filmtong.movie.vo.popular.PopularMovieInfoVO">
+		INSERT INTO POPULAR_MOVIE(
+		<include refid="popularMovieCols"/>
+		)
+		VALUES
+		<foreach collection="popularMovieInfoList" item="popularMovieInfo" separator=",">
+		(
+		#{popularMovieInfo.id}, #{popularMovieInfo.title}, #{popularMovieInfo.adult}, #{popularMovieInfo.original_title}, 
+		#{popularMovieInfo.overview}, #{popularMovieInfo.popularity}, #{popularMovieInfo.release_date}, #{popularMovieInfo.vote_average},
+		#{popularMovieInfo.vote_count}, #{popularMovieInfo.poster_path}, #{popularMovieInfo.backdrop_path}
+		)
+		</foreach>
+	</insert>
+	<insert id="insertPopularMovie" parameterType="info.filmtong.movie.vo.popular.PopularMovieInfoVO">
+		INSERT INTO POPULAR_MOVIE(
+		<include refid="popularMovieCols" />
+		)
+		VALUES(
+		 #{id}, #{title}, #{adult}, #{original_title},
+		 #{overview}, #{popularity}, #{release_date}, #{vote_average},
+		 #{vote_count}, #{poster_path}, #{backdrop_path},
+		)
+	</insert>
+</mapper>

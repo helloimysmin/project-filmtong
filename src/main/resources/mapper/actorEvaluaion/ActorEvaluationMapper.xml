@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.filmtong.movie.mapper.ActorEvaluationMapper">
+	<sql id="actorEvaluationCols">
+		PI.PI_ID, UI.UI_NUM, AE.AE_THUMBS_UP, UI.UI_ID,
+		UI.UI_NICKNAME
+		FROM ACTOR_EVALUATION AE 
+		INNER JOIN PERSON_INFO PI 
+		ON AE.PI_ID=PI.PI_ID
+		INNER JOIN USER_INFO UI
+		ON AE.UI_NUM=UI.UI_NUM
+	</sql>
+	<select id="selectActorEvaluationByPiIdAndUiNum" resultType="info.filmtong.movie.vo.actorEvaluation.ActorEvaluationVO">
+		SELECT 
+		<include refid="actorEvaluationCols" />
+		WHERE PI.PI_ID=#{piId}
+		AND UI.UI_NUM=#{uiNum}
+	</select>
+	<select id="selectActorEvaluationByUiNum" resultType="info.filmtong.movie.vo.actorEvaluation.ActorEvaluationVO">
+		SELECT 
+		PI.PI_ID, UI.UI_NUM, AE.AE_THUMBS_UP, UI.UI_ID,
+		UI.UI_NICKNAME, PI.PI_BIRTHDAY, PI.PI_GENDER, PI.PI_HOMEPAGE, 
+		PI.PI_PLACE_OF_BIRTH, PI.PI_NAME, PI.PI_DEATH_DAY
+		FROM ACTOR_EVALUATION AE 
+		INNER JOIN PERSON_INFO PI 
+		ON AE.PI_ID=PI.PI_ID
+		INNER JOIN USER_INFO UI
+		ON AE.UI_NUM=UI.UI_NUM
+		WHERE UI.UI_NUM=#{uiNum}
+	</select>
+	<insert id="insertActorEvaluation" parameterType="info.filmtong.movie.vo.actorEvaluation.ActorEvaluationVO">
+		INSERT INTO ACTOR_EVALUATION
+		(
+		PI_ID, UI_NUM, AE_THUMBS_UP
+		)
+		VALUES
+		(
+		#{piId}, #{uiNum}, 'Y'
+		)
+	</insert>
+	<delete id="deleteActorEvaluation">
+		DELETE FROM ACTOR_EVALUATION
+		WHERE PI_ID=#{piId}
+		AND UI_NUM=#{uiNum}
+	</delete>
+</mapper>

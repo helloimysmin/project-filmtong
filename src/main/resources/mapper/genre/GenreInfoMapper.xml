@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.filmtong.movie.mapper.GenreInfoMapper">
+	<select id="selectGenreInfoList" resultType="info.filmtong.movie.vo.genre.GenreInfoVO">
+		SELECT ID, GENRE_ID
+		FROM GENRE_INFO
+	</select>
+	<insert id="insertGenreInfo">
+		INSERT INTO GENRE_INFO(ID, GENRE_ID)
+		VALUES(#{id}, #{genreId})
+	</insert>
+	<insert id="insertGenreInfos">
+		INSERT INTO GENRE_INFO(ID, GENRE_ID)
+		VALUES
+		<foreach collection="genreInfoList" item="genreInfo" separator=",">
+		(
+		#{genreInfo.id}, #{genreInfo.genreId}
+		)
+		</foreach>
+	</insert>
+</mapper>

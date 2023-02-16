@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.filmtong.movie.mapper.MovieGenreMapper">
+	<select id="selectMovieGenreList" resultType="info.filmtong.movie.vo.moviegenre.MovieGenreVO">
+		SELECT ID, NAME 
+		FROM MOVIE_GENRE
+	</select>
+	<insert id="insertGenreInfos">
+		INSERT INTO MOVIE_GENRE
+		(ID, NAME)
+		VALUES
+		<foreach collection="movieGenreList" item="movieGenre" separator=",">
+		(
+		#{movieGenre.id}, #{movieGenre.name}
+		)
+		</foreach>
+	</insert>
+</mapper>

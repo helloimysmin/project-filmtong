@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<style>
+.leftDiv {
+	width: 45%;
+	float: left;
+}
+.rightDiv {
+	width: 45%;
+	float: right;
+}   
+table {
+	width: 100%
+}
+.clear {
+	width: 0px;
+	height: 0px;
+	clear: both;
+}
+
+</style>
+<body>
+<div class="leftDiv">
+	<table border="1">
+		<tr>
+			<td colspan="3" align="right">
+				<button onclick="addMember()">추가</button>
+			</td>
+		</tr>
+		<tr>
+			<th>번호</th>
+			<th>아이디</th>
+			<th>이메일</th>
+		</tr>
+		<tbody id="member"></tbody>
+		<tbody>
+		<tr>
+			<th colspan="3" align="right" onclick="saveMember()"><button>저장</button></th>
+		</tr>
+		</tbody>
+	</table>
+</div>
+<div class="rightDiv">
+	<table border="1">
+		<tr>
+			<td colspan="4" align="right">
+				<button onclick="addClass()">추가</button>
+			</td>
+		</tr>
+		<tr>
+			<th>번호</th>
+			<th>클래스명</th>
+			<th>클래스설명</th>
+			<th>수강인원</th>
+		</tr>
+		<tbody id="class"></tbody>
+		<tbody>
+		<tr>
+			<th colspan="4" align="right" onclick="saveClass()"><button>저장</button></th>
+		</tr>
+		</tbody>
+	</table>
+</div>
+<div class="clear"></div>
+
+<div class="centerDiv">
+	<table border="1">
+		<tr>
+			<td colspan="4" align="right">
+				<button onclick="addMemberClassMap()">추가</button>
+			</td>
+		</tr>
+		<tr>
+			<th>번호</th>
+			<th>클래스선택</th>
+			<th>유저선택</th>
+		</tr>
+		<tbody id="memberClass"></tbody>
+		<tbody>
+		<tr>
+			<th colspan="4" align="right" onclick="saveMemberClassMap()"><button>저장</button></th>
+		</tr>
+		</tbody>
+	</table>
+</div>
+<script>
+const members = [];
+const classes = [];
+const memberClassMaps = [];
+
+function addMemberClassMap() {
+	let html = '<tr>';
+	html += '<td>&nbsp;</td>';
+	html += '<td><select name="miNum">';
+	for(const member of members) {
+		html += '<option value="' + member.miNum + '">' + member.miId + '</option>';
+	}
+	html += '</select></td>';
+	html += '<td><select name="ciNum">';
+	for(const clazz of classes) {
+		html += '<option value="' + clazz.ciNum + '">' + clazz.ciName + '</option>';
+	}
+	html += '</select></td>';
+	html += '</tr>';
+	document.querySelector('#memberClass').insertAdjacentHTML('beforeend', html);
+}
+async function saveMember() {
+	const miIdObjs = document.querySelectorAll('input[name="miId"]');
+	const miEmailObjs = document.querySelectorAll('input[name="miEmail"]');
+	const params = [];
+	for(let i=0; i<miIdObjs.length; i++) {
+		const miIdObj = miIdObjs[i];
+		const miEmailObj = miEmailObjs[i];
+		const param = {
+				miId : miIdObj.value,
+				miEmail : miEmailObj.value
+		}
+		params.push(param);
+	}
+	console.log(params);
+	const insertRes = await fetch('/member-infos', {
+		method : 'POST',
+		body : JSON.stringify(params),
+		headers : {
+			'Content-type' : 'application/json'
+		}
+	});
+	const result = await insertRes.json();
+	if(result === params.length) {
+		alert('추가 성공');
+		await getMemberInfos();
+	}
+}
+async function saveClass() {
+	const ciNameObjs = document.querySelectorAll('input[name="ciName"]');
+	const ciDescObjs = document.querySelectorAll('input[name="ciDesc"]');
+	const params = [];
+	for(let i=0; i<ciNameObjs.length; i++) {
+		const ciNameObj = ciNameObjs[i];
+		const ciDescObj = ciDescObjs[i];
+		const param = {
+				ciName : ciNameObj.value,
+				ciDesc : ciDescObj.value
+		}
+		params.push(param);
+	}
+	const insertRes = await fetch('/class-infos', {
+		method : 'POST',
+		body : JSON.stringify(params),
+		headers : {
+			'Content-type' : 'application/json'
+		}
+	});
+	const result = await insertRes.json();
+	if(result === params.length) {
+		alert('추가 성공');
+		await getClassInfos();
+	}
+}
+
+async function saveMemberClassMap() {
+	const param = {
+			miNum : document.querySelector('select[name="miNum"]').value,
+			ciNum : document.querySelector('select[name="ciNum"]').value
+	}
+	const insertRes = await fetch('/mcmaps', {
+		method : 'POST',
+		headers : {
+			'Content-Type' : 'application/json'
+		},
+		body : JSON.stringify(param)
+	});
+	const result = await insertRes.json();
+	if(result === 1) {
+		alert('추가 성공');
+	}
+}
+
+async function checkMiId(obj) {
+	const checkMiIdRes = await fetch('/member-infos/' + obj.value);
+	const checkMiId = await checkMiIdRes.json();
+	if(checkMiId === true) {
+		alert('이미 존재하는 아이디입니다.');
+		obj.value = '';
+		obj.focus();
+	}
+}
+
+async function checkMiEmail(obj) {
+	const checkMiIdRes = await fetch('/member-infos/' + obj.value);
+	const checkMiId = await checkMiIdRes.json();
+	if(checkMiId === true) {
+		alert('이미 존재하는 아이디입니다.');
+		obj.value = '';
+		obj.focus();
+	}
+}
+
+function addMember() {
+	let html = '<tr>';
+	html += '<td>&nbsp;</td>';
+	html += '<td><input type="text" name="miId" onchange="checkMiId(this)"></td>';
+	html += '<td><input type="text" name="miEmail" onchange="checkMiEmail(this)"></td>';
+	html += '</tr>';
+	document.querySelector('#member').insertAdjacentHTML('beforeend', html);
+}
+function addClass() {
+	let html = '<tr>';
+	html += '<td>&nbsp;</td>';
+	html += '<td><input type="text" name="ciName"></td>';
+	html += '<td><input type="text" name="ciDesc"></td>';
+	html += '<td><input type="text" name="ciCnt"></td>';
+	html += '</tr>';
+	document.querySelector('#class').insertAdjacentHTML('beforeend', html);
+}
+async function getMemberInfos(ciNum) {
+	let param = ciNum ? '?ciNum=' + ciNum : '';
+	const memberInfosRes = await fetch('/member-infos' + param);
+	return await memberInfosRes.json();
+}
+
+async function innerHTMLMember() {
+	const memberInfos = await getMemberInfos();
+	if(!members.length) {
+		memberInfos.forEach((memberInfo)=>{
+			members.push(memberInfo);
+		});
+	}
+	let html = '';
+	for(const memberInfo of memberInfos) {
+		html += '<tr>';
+		html += '<td>' + memberInfo.miNum + '</td>';
+		html += '<td>' + memberInfo.miId + '</td>';
+		html += '<td>' + memberInfo.miEmail + '</td>';
+		html += '</tr>';
+	}
+	document.querySelector('#member').innerHTML = html;
+}
+
+async function getClassInfos() {
+	const classInfosRes = await fetch('/class-infos');
+	return await classInfosRes.json();
+}
+
+async function innerHTMLClass() {
+	const classInfos = await getClassInfos();
+	if(!classes.length) {
+		classInfos.forEach((classInfo)=>{
+			classes.push(classInfo);
+		})
+	}
+	let html = '';
+	for(const classInfo of classInfos) {
+		html += '<tr>';
+		html += '<td>' + classInfo.ciNum + '</td>';
+		html += '<td>' + classInfo.ciName + '</td>';
+		html += '<td>' + classInfo.ciDesc + '</td>';
+		html += '<td><a href="javascript:void(0);getMemberInfos(' +classInfo.ciNum  + ')">' + classInfo.ciCnt + '</a></td>';
+		html += '</tr>';
+	}
+	document.querySelector('#class').innerHTML = html;
+}
+
+async function getMemberClassMap() {
+	const memberClassInfos = await fetch('/mcmaps');
+	return await memberClassInfos.json();
+}
+
+async function innerHTMLMemberClassMap() {
+	const memberClassMapInfos = await getMemberClassMap();
+	if(!memberClassMaps.length) {
+		memberClassMapInfos.forEach((memberClassMap)=>{
+			memberClassMaps.push(memberClassMap);
+		})
+	}
+	let html = '';
+	for(const memberClassMap of memberClassMapInfos) {
+		html += '<tr>';
+		html += '<td>' + memberClassMap.mcmNum + '</td>';
+		html += '<td>' + memberClassMap.ciNum + '</td>';
+		html += '<td>' + memberClassMap.miNum + '</td>';
+		html += '</tr>';
+	}
+	document.querySelector('#memberClass').innerHTML = html;
+}
+ 
+window.addEventListener('load', async function() {
+	await innerHTMLMember();
+	await innerHTMLClass();
+	await innerHTMLMemberClassMap();
+})
+</script>
+</body>
+</html>

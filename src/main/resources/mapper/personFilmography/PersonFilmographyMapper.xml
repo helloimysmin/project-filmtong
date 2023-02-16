@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.filmtong.movie.mapper.PersonFilmographyMapper">
+	<select id="selectPersonMovieByPfId" resultType="info.filmtong.movie.vo.person.PersonFilmographyVO">
+		SELECT
+		PF_ID, PF_TITLE, PF_ORIGINAL_TITLE, PF_OVERVIEW, 
+		PF_POSTER_PATH, PF_RELEASE_DATE, PF_CHARACTER, PI_ID
+		FROM PERSON_FILMOGRAPHY
+		WHERE PI_ID=#{piId}
+	</select>
+	<insert id="insertPersonFilmography" parameterType="info.filmtong.movie.vo.person.PersonFilmographyVO">
+		INSERT INTO PERSON_FILMOGRAPHY
+		(
+		PF_ID, PF_TITLE, PF_ORIGINAL_TITLE, PF_OVERVIEW, 
+		PF_POSTER_PATH, PF_RELEASE_DATE, PF_CHARACTER, PI_ID
+		)
+		VALUES
+		(
+		#{pfId}, #{pfTitle}, #{pfOriginalTitle}, #{pfOverview}, 
+		#{pfPosterPath}, #{pfReleaseDate}, #{pfCharacter}, #{piId}
+		)
+	</insert>
+</mapper>

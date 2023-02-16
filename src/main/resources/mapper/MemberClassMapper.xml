@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.filmtong.movie.mapper.MemberClassMapper">
+	<select id="selectMemberInfos" resultType="info.filmtong.movie.vo.MemberInfoVO">
+      SELECT MI.* FROM MEMBER_INFO MI
+      <where>
+      	<if test="ciNum != 0">
+		      AND EXISTS
+				(SELECT 1 FROM MEMBER_INFO_CLASS_INFO_MAP MCM 
+				WHERE MCM.CI_NUM = #{ciNum}
+				AND MI.MI_NUM = MCM.MI_NUM)
+		</if>
+      </where>
+   </select>
+   <select id="selectMemberInfoByMiNum" resultType="info.filmtong.movie.vo.MemberInfoVO">
+      SELECT * FROM MEMBER_INFO 
+      WHERE MI_ID = #{miId}
+      OR
+      MI_EMAIL = #{miEmail}
+   </select>
+   <select id="selectClassInfos" resultType="info.filmtong.movie.vo.ClassInfoVO">
+	SELECT CI.*,
+	(SELECT COUNT(1) FROM MEMBER_INFO_CLASS_INFO_MAP MCM
+	WHERE MCM.CI_NUM = CI.CI_NUM) CI_CNT
+	FROM CLASS_INFO CI
+   </select>
+   <select id="selectClassInfoByCiName" resultType="info.filmtong.movie.vo.ClassInfoVO">
+      SELECT * FROM CLASS_INFO
+      WHERE CI_NAME = #{ciName}
+   </select>
+   <select id="selectMemberInfoClassInfoMap" resultType="info.filmtong.movie.vo.MemberInfoClassInfoMapVO">
+      SELECT * FROM MEMBER_INFO_CLASS_INFO_MAP
+   </select>
+   <insert id="insertMemberInfo" parameterType="info.filmtong.movie.vo.MemberInfoVO">
+      INSERT INTO MEMBER_INFO(MI_ID, MI_EMAIL)
+      VALUES(#{miId}, #{miEmail})
+   </insert>
+   <insert id="insertClassInfo" parameterType="info.filmtong.movie.vo.ClassInfoVO">
+      INSERT INTO CLASS_INFO(CI_NAME, CI_DESC)
+      VALUES(#{ciName}, #{ciDesc})
+   </insert>
+   <insert id="insertMemberInfoClassInfoMap" parameterType="info.filmtong.movie.vo.MemberInfoClassInfoMapVO">
+       INSERT INTO MEMBER_INFO_CLASS_INFO_MAP(MI_NUM,CI_NUM)
+      VALUES(#{miNum}, #{ciNum})
+   </insert>
+</mapper>

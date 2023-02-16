@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.filmtong.movie.mapper.BoardMapper">
+	<select id="selectBoards" resultType="info.filmtong.movie.vo.BoardVO">
+		SELECT 
+		NO, TITLE, CONTENT, WRITER, CREDAT
+		FROM BOARD
+	</select>
+	<select id="selectBoardByNo" resultType="info.filmtong.movie.vo.BoardVO">
+		SELECT 
+		NO, TITLE, CONTENT, WRITER, CREDAT
+		FROM BOARD
+		WHERE NO = #{no}
+	</select>
+	<insert id="insertBoard" parameterType="info.filmtong.movie.vo.BoardVO">
+		INSERT INTO BOARD
+		(
+		TITLE, CONTENT, WRITER, CREDAT
+		)
+		VALUES
+		(
+		#{title}, #{content}, #{writer}, DATE_FORMAT(NOW(),'%Y%m%d')
+		)
+	</insert>
+	<update id="updateBoard" parameterType="info.filmtong.movie.vo.BoardVO">
+		UPDATE BOARD
+		SET TITLE = #{title},
+		CONTENT = #{content}
+		WHERE NO = #{no}
+	</update>
+	<delete id="deleteBoard">
+		DELETE FROM BOARD
+		WHERE NO = #{no}
+	</delete>
+</mapper>

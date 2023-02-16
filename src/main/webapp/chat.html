@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js" integrity="sha512-1QvjE7BtotQjkq8PxLeF6P46gEpBRXuskzIVgjFpekzFVF4yjRgrQvTG1MTOJ3yQgvTteKAcO7DSZI92+u/yZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" integrity="sha512-iKDtgDyTHjAitUDdLljGhenhPwrbBfqTKWO1mkhSFH3A7blITC9MhYon6SjnMhp4o0rADGw9yAC6EW4t5a4K3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<input type="text" id="name"><br>
+<button onclick="connection()">연결</button>
+<div id="chatDiv" style="display:none">
+<textarea id="chatContent" style="resize:none" cols="40" rows="20"></textarea><br>
+<input type="text" id="msg"><button onclick="sendMessage()">전송</button>
+</div>
+<script>
+let webSocket;
+function connection() {
+	let socket = new SockJS('/ws/chat');
+	webSocket = Stomp.over(socket);
+	webSocket.connect({}, function(evt) {
+		document.querySelector('#chatDiv').style.display = '';
+		webSocket.subscribe('/topic/message', function(data) {
+			const msg = JSON.parse(data.body);
+			console.log(msg);
+			document.querySelector('#chatContent').value += '\r\n[' + msg.sender + ']:' + msg.msg;
+		})
+		const msg = {
+			sender : document.querySelector('#name').value,
+			msg : document.querySelector('#name').value + '님 입장'
+		}
+		webSocket.send('/app/message', {}, JSON.stringify(msg));
+	},
+	function(err) {
+		console.error(err);
+	});
+}
+
+function sendMessage() {
+	const msg = {
+		sender : document.querySelector('#name').value,
+		msg : document.querySelector('#msg').value
+	}
+	webSocket.send('/app/message', {}, JSON.stringify(msg));
+}
+</script>
+</body>
+</html>

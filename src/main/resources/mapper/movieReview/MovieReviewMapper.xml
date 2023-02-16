@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.filmtong.movie.mapper.MovieReviewMapper">
+	<sql id="movieReviewCols">
+		PM.ID, PM.TITLE, MR.UI_NUM, UI.UI_ID, 
+		UI.UI_NICKNAME, MR.MR_NUM, MR.MR_CONTENT, MR.CREDAT, 
+		MR.CRETIM, MR.LMODAT, MR.LMOTIM, UI.UI_PROFILE_IMG, 
+		MR.MR_RATING
+		FROM MOVIE_REVIEW AS MR
+		INNER JOIN POPULAR_MOVIE AS PM
+		ON MR.ID=PM.ID 
+		INNER JOIN USER_INFO AS UI 
+		ON MR.UI_NUM=UI.UI_NUM
+	</sql>
+	<select id="selectMovieReviews" resultType="info.filmtong.movie.vo.movieReview.MovieReviewVO">
+		SELECT 
+		<include refid="movieReviewCols"></include>
+		ORDER BY MR.LMODAT DESC, MR.LMOTIM DESC
+	</select>
+	<select id="selectMovieReviewById" resultType="info.filmtong.movie.vo.movieReview.MovieReviewVO">
+		SELECT 
+		<include refid="movieReviewCols"></include>
+		WHERE PM.ID=#{id}
+		ORDER BY MR.LMODAT DESC, MR.LMOTIM DESC
+	</select>
+	<select id="selectMovieReviewByUiNum" resultType="info.filmtong.movie.vo.movieReview.MovieReviewVO">
+		SELECT
+		<include refid="movieReviewCols"></include>
+		WHERE MR.UI_NUM=#{uiNum}
+		ORDER BY MR.LMODAT DESC, MR.LMOTIM DESC
+	</select>
+	<select id="selectMovieReviewByMrNum" resultType="info.filmtong.movie.vo.movieReview.MovieReviewVO">
+		SELECT 
+		<include refid="movieReviewCols"></include>
+		WHERE MR.MR_NUM=#{mrNum}
+	</select>
+	<insert id="insertMovieReview" parameterType="info.filmtong.movie.vo.movieReview.MovieReviewVO">
+		INSERT INTO MOVIE_REVIEW(
+		ID, UI_NUM, MR_RATING, MR_CONTENT, 
+		CREDAT, CRETIM, LMODAT, LMOTIM
+		)
+		VALUES
+		(
+		#{id}, #{uiNum}, #{mrRating}, #{mrContent}, 
+		DATE_FORMAT(NOW(),'%Y-%m-%d'), DATE_FORMAT(NOW(),'%H:%i:%d'), 
+		DATE_FORMAT(NOW(),'%Y-%m-%d'), DATE_FORMAT(NOW(),'%H:%i:%d')
+		)
+	</insert>
+	<update id="updateMovieReview" parameterType="info.filmtong.movie.vo.movieReview.MovieReviewVO">
+		UPDATE MOVIE_REVIEW
+		SET MR_CONTENT=#{mrContent},
+		LMODAT=DATE_FORMAT(NOW(),'%Y-%m-%d'),
+		LMOTIM=DATE_FORMAT(NOW(),'%H:%i:%d'),
+		MR_RATING = #{mrRating}
+		WHERE MR_NUM=#{mrNum}
+	</update>
+	<delete id="deleteMovieReview">
+		DELETE FROM MOVIE_REVIEW
+		WHERE MR_NUM=#{mrNum}
+	</delete>
+</mapper>

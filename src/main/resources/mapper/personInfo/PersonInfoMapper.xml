@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD MaPIer 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.filmtong.movie.mapper.PersonInfoMapper">
+
+	<select id="selectPersonInfoByPiId" resultType="info.filmtong.movie.vo.person.PersonInfoVO">
+		SELECT
+		PI.PI_ID, PI.PI_BIOGRAPHY, PI.PI_BIRTHDAY, PI.PI_GENDER, 
+		PI.PI_HOMEPAGE, PI.PI_PLACE_OF_BIRTH, PI.PI_PROFILE_PATH, PI.PI_NAME,
+		PI.PI_DEATH_DAY
+		FROM PERSON_INFO PI
+		WHERE PI.PI_ID=#{piId} 
+	</select>
+	
+	<insert id="insertPersonInfo" parameterType="info.filmtong.movie.vo.person.PersonInfoVO">
+		INSERT INTO PERSON_INFO
+		(
+		PI_ID, PI_BIOGRAPHY, PI_BIRTHDAY, PI_GENDER, 
+		PI_HOMEPAGE, PI_PLACE_OF_BIRTH, PI_PROFILE_PATH, PI_NAME,
+		PI_DEATH_DAY
+		)
+		VALUES
+		(
+		#{piId}, #{piBiography}, #{piBirthDay}, #{piGender},
+		#{piHomepage}, #{piPlaceOfBirth}, #{piProfilePath}, #{piName},
+		#{piDeathDay}
+		)
+	</insert>
+	
+	<insert id="insertPersonInfoWithPersonResponse" parameterType="info.filmtong.movie.vo.person.PersonResponseVO">
+		INSERT INTO PERSON_INFO
+		(
+		PI_ID, PI_BIOGRAPHY, PI_BIRTHDAY, PI_GENDER, 
+		PI_HOMEPAGE, PI_PLACE_OF_BIRTH, PI_PROFILE_PATH, PI_NAME,
+		PI_DEATH_DAY
+		)
+		VALUES
+		(
+		#{id}, #{biography}, #{birthday}, #{gender},
+		#{homepage}, #{place_of_birth}, #{profile_path}, #{name},
+		#{deathday}
+		)
+	</insert>
+</mapper>

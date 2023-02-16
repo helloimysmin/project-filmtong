@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<label for="sido">시도</label>
+<select id="sido">
+	<option value="">선택</option>
+</select>
+
+<label for="sido">구군</label>
+<select id="gugun">
+	<option value="">선택</option>
+</select>
+
+<label for="sido">동</label>
+<select id="dong">
+	<option value="">선택</option>
+</select>
+<script>
+
+async function setDong(guNum) {
+	const res = await fetch('/dong/' + guNum)
+	const dongs = await res.json();
+	let html = '';
+	if(dongs) {
+		for(const dong of dongs) {
+			html += '<option value="' + dong.doNum + '">' + dong.dong + '</option>';
+		}
+	}
+	document.querySelector('#dong').innerHTML = '<option value="">선택</option>';
+	document.querySelector('#dong').insertAdjacentHTML('beforeend', html);
+	document.querySelector('#dong').disabled = false;
+}
+
+async function changeGugun() {
+	if(this.value) {
+		await setDong(this.value);
+	}else{
+		document.querySelector('#dong').disabled = true;
+	}
+}
+
+async function setGugun(siNum) {
+	const res = await fetch('/gugun/' + siNum)
+	const guguns = await res.json();
+	let html = '';
+	if(guguns) {
+		for(const gugun of guguns) {
+			html += '<option value="' + gugun.guNum + '">' + gugun.guName + '</option>';
+		}
+	}
+	document.querySelector('#gugun').innerHTML = '<option value="">선택</option>';
+	document.querySelector('#gugun').insertAdjacentHTML('beforeend', html);
+	document.querySelector('#gugun').disabled = false;
+	document.querySelector('#gugun').onchange = changeGugun;
+}
+
+async function changeSido() {
+	if(this.value) {
+		await setGugun(this.value);
+	}else{
+		document.querySelector('#gugun').disabled = true;
+		document.querySelector('#dong').disabled = true;
+	}
+}
+
+async function setSido() {
+	const res = await fetch('/sido')
+	const sidos = await res.json();
+	let html = '';
+	if(sidos) {
+		for(const sido of sidos) {
+			html += '<option value="' + sido.siNum + '">' + sido.siName + '</option>';
+		}
+	}
+	document.querySelector('#sido').insertAdjacentHTML('beforeend', html);
+	document.querySelector('#sido').disabled = false;
+	document.querySelector('#sido').onchange = changeSido;
+}
+
+window.addEventListener('load', async function() {
+	document.querySelectorAll('select').forEach((obj)=>{
+		obj.disabled = true;
+	});
+	setSido();
+})
+</script>
+</body>
+</html>

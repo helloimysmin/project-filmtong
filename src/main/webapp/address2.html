@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<label for="sido">시도</label>
+<select id="sido">
+	<option value="">선택</option>
+</select>
+
+<label for="sido">구군</label>
+<select id="gugun">
+	<option value="">선택</option>
+</select>
+
+<label for="sido">동</label>
+<select id="dong">
+	<option value="">선택</option>
+</select>
+<script>
+const sidos = [];
+const guguns = [];
+const dongs = [];
+
+function copyList(sourceArr, targetArr){
+	for(const source of sourceArr){
+		targetArr.push(source);
+	}
+}
+function changeGugun(){
+	const tmpDongs = dongs.filter(dong=>dong.guNum == this.value);
+	let html = '';
+	for(const dong of tmpDongs){
+		html += '<option value="' + dong.doNum + '">' + dong.dong + '</option>';	
+	}
+	document.querySelector('#dong').innerHTML = '<option value="">선택</option>';
+	document.querySelector('#dong').insertAdjacentHTML('beforeend', html);
+	document.querySelector('#dong').disabled = false;
+}
+
+function changeSido(){
+	const tmpGuguns = guguns.filter(gugun=>gugun.siNum == this.value);
+	let html = '';
+	for(const gugun of tmpGuguns){
+		html += '<option value="' + gugun.guNum + '">' + gugun.guName + '</option>';	
+	}
+	document.querySelector('#gugun').innerHTML = '<option value="">선택</option>';
+	document.querySelector('#gugun').insertAdjacentHTML('beforeend', html);
+	document.querySelector('#gugun').disabled = false;
+	document.querySelector('#gugun').onchange = changeGugun;
+}
+function setSidos(){
+	let html = '';
+	for(const sido of sidos){
+		html += '<option value="' + sido.siNum + '">' + sido.siName + '</option>';
+	}
+	document.querySelector('#sido').insertAdjacentHTML('beforeend', html);
+	document.querySelector('#sido').disabled = false;
+	document.querySelector('#sido').onchange = changeSido;
+}
+
+window.addEventListener('load', async function() {
+	document.querySelectorAll('select').forEach((obj)=>{
+		obj.disabled = true;
+	});
+	const res = await fetch('/address');
+	const address = await res.json();
+	copyList(address.sidoList,sidos);
+	copyList(address.gugunList,guguns);
+	copyList(address.dongList,dongs);
+	setSidos();
+})
+</script>
+</body>
+</html>

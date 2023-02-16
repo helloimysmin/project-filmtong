@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.filmtong.movie.mapper.AddressMapper">
+	<select id="selectSidoList" resultType="info.filmtong.movie.vo.SidoVO">
+		SELECT * FROM SIDO
+	</select>
+	<select id="selectGugunList" resultType="info.filmtong.movie.vo.GugunVO">
+		SELECT * FROM GUGUN
+		<where>
+			<if test='siNum != null and siNum != 0'>
+				AND SI_NUM = #{siNum}
+			</if>
+		</where>
+	</select>
+	<select id="selectDongList" resultType="info.filmtong.movie.vo.DongVO">
+		SELECT * FROM DONG
+		<where>
+			<if test='doNum != null and doNum != 0'>
+				AND DO_NUM = #{doNum}
+			</if>
+		</where>
+	</select>
+</mapper>

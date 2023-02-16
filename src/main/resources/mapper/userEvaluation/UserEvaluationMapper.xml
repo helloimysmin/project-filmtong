@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.filmtong.movie.mapper.UserEvaluationMapper">
+	<sql id="userEvaluationCols">
+		PM.ID, PM.TITLE, UI.UI_NUM, UI.UI_ID, 
+		UI.UI_NICKNAME, UE.UE_THUMBS_UP
+		FROM USER_EVALUATION UE
+		INNER JOIN POPULAR_MOVIE PM
+		ON PM.ID=UE.ID 
+		INNER JOIN USER_INFO UI
+		ON UI.UI_NUM = UE.UI_NUM
+	</sql>
+	<select id="selectUserEvaluationById" resultType="info.filmtong.movie.vo.userEvaluation.UserEvaluationVO">
+		SELECT
+		<include refid="userEvaluationCols"></include>
+		WHERE PM.ID=#{id}
+	</select>
+	<select id="selectUserEvaluationByIdAndUiId" resultType="info.filmtong.movie.vo.userEvaluation.UserEvaluationVO">
+		SELECT 
+		<include refid="userEvaluationCols"></include>
+		WHERE PM.ID=#{id}
+		AND UI.UI_ID=#{uiId}
+	</select>
+	<select id="selectUserEvaluationByUiNum" resultType="info.filmtong.movie.vo.userEvaluation.UserEvaluationVO">
+		SELECT 
+		PM.ID, PM.TITLE, UI.UI_NUM, UI.UI_ID, 
+		UI.UI_NICKNAME, UE.UE_THUMBS_UP, 
+		PM.VOTE_AVERAGE, PM.RELEASE_DATE, PM.ORIGINAL_TITLE
+		FROM USER_EVALUATION UE
+		INNER JOIN POPULAR_MOVIE PM
+		ON PM.ID=UE.ID 
+		INNER JOIN USER_INFO UI
+		ON UI.UI_NUM = UE.UI_NUM
+		WHERE UI.UI_NUM=#{uiNum}
+	</select>
+	<insert id="insertUserEvaluation" parameterType="info.filmtong.movie.vo.userEvaluation.UserEvaluationVO">
+		INSERT INTO USER_EVALUATION(
+		UI_NUM, ID, UE_THUMBS_UP)
+		VALUES(#{uiNum}, #{id}, 'Y')
+	</insert>
+	<delete id="deleteUserEvaluation">
+		DELETE FROM USER_EVALUATION
+		WHERE UI_NUM = #{uiNum}
+		AND ID = #{id}
+	</delete>
+</mapper>
